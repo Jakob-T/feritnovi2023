@@ -1,0 +1,14 @@
+<resources>
+  <string name="app_name">ferit</string>
+  <string name="home_title">Good morning</string>
+  <string name="home_subtitle">What would you like to cook today?</string>
+  <string name="home_search_label">Search</string>
+  <string name="home_filter_all">All</string>
+  <string name="home_filter_breakfast">Breakfast</string>
+  <string name="home_filter_lunch">Lunch</string>
+  <string name="home_add_new_reciper">Add new recipe</string>
+  <string name="home_header_recipe">7 recipes</string>
+  <string name="home_recipe_card_title">Strawberry cake</string>
+  <string name="home_recipe_card_time">30 min</string>
+  <string name="home_recipe_card_ingredients">4 ingredients</string>
+</resources>
