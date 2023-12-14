@@ -11,9 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.ferit.ferit.details.RecipeDetailsScreen
-import com.ferit.ferit.home.RecipesScreen
-import com.ferit.ferit.models.recipes
 import com.ferit.ferit.ui.theme.FeritTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,8 +21,7 @@ class MainActivity : ComponentActivity() {
       FeritTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          /*RecipesScreen()*/
-          RecipeDetailsScreen(recipe = recipes[0])
+          NavigationController()
         }
       }
     }

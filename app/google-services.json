@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "305562363148",
+    "project_id": "ormwalv8-2e54a",
+    "storage_bucket": "ormwalv8-2e54a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305562363148:android:0c726b68b660a031649529",
+        "android_client_info": {
+          "package_name": "com.ferit.ferit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_voY-xx96jDBkBHgZQfCe86VzVVUzxYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

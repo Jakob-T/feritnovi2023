@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,19 +25,26 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.ferit.ferit.R
+import com.ferit.ferit.details.DetailsState.Success
 import com.ferit.ferit.home.IconButton
 import com.ferit.ferit.models.Recipe
 import com.ferit.ferit.ui.theme.DarkGray
@@ -49,8 +55,37 @@ import com.ferit.ferit.ui.theme.Transparent
 import com.ferit.ferit.ui.theme.White
 
 @Composable
-fun RecipeDetailsScreen(
-  /*navController: NavController,*/
+fun DetailsPage(
+  navController: NavController,
+  recipeId: String
+) {
+  val viewModel: DetailsViewModel = viewModel()
+  val state = viewModel.state.collectAsState()
+
+  LaunchedEffect(
+    key1 = "",
+    block = {
+      viewModel.getRecipe(recipeId)
+    }
+  )
+
+  when(state.value) {
+    is DetailsState.Loading -> DetailsLoading()
+    is DetailsState.Success -> DetailsPageContent(
+      navController = navController,
+      recipe =  (state.value as Success).state
+    )
+  }
+}
+
+@Composable
+fun DetailsLoading() {
+
+}
+
+@Composable
+fun DetailsPageContent(
+  navController: NavController,
   recipe: Recipe
 ) {
   val scrollState = rememberLazyListState()
@@ -62,12 +97,16 @@ fun RecipeDetailsScreen(
       .fillMaxSize()
   ) {
     item {
-      TopImageAndBar(recipe.image)
-      ScreenInfo (recipe.title, recipe.category)
+      TopImageAndBar(
+        coverImage = recipe.image,
+        navController = navController
+      )
+      ScreenInfo (
+        title = recipe.title,
+        category = recipe.category,
+      )
       BasicInfo(recipe)
       Description(recipe)
-      /*Servings()
-      IngredientsHeader()*/
       IngredientsList(recipe)
       ShoppingListButton()
       Reviews(recipe)
@@ -78,22 +117,24 @@ fun RecipeDetailsScreen(
 
 @Composable
 fun IngredientCard(
-  @DrawableRes iconResource: Int,
+  image: String,
   title: String,
   subtitle: String
 ) {
   Column(
   ) {
     Spacer(modifier = Modifier.height(8.dp))
-    Image(
-      painter = painterResource(id = iconResource),
+    AsyncImage(
+      model = ImageRequest.Builder(LocalContext.current)
+        .data(image)
+        .crossfade(true)
+        .build(),
       contentDescription = title,
       modifier = Modifier
         .align(alignment = Alignment.CenterHorizontally)
         .width(70.dp)
         .height(70.dp),
       contentScale = ContentScale.Fit
-
     )
     Text(
       text = title,
@@ -131,37 +172,42 @@ fun CircularButton(
     Icon(
       painter = painterResource(id = iconResource),
       contentDescription = null,
+      tint = Pink
     )
   }
 }
 
 @Composable
 fun TopImageAndBar(
-  @DrawableRes coverImage: Int
+  coverImage: String,
+  navController: NavController
 ) {
   Box(
   ) {
-    Image(
-      painter = painterResource(id = coverImage), contentDescription = null,
+
+    AsyncImage(
+      model = ImageRequest.Builder(LocalContext.current)
+        .data(coverImage)
+        .crossfade(true)
+        .build(),
+      contentDescription = "",
       contentScale = ContentScale.Crop,
-      modifier = Modifier
-        .fillMaxSize()
+      modifier = Modifier.fillMaxSize()
     )
-    Column(
-      modifier = Modifier.fillMaxHeight()
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween,
+      modifier = Modifier
+        .fillMaxWidth()
+        .statusBarsPadding()
+        .height(56.dp)
+        .padding(horizontal = 16.dp)
     ) {
-      Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-          .fillMaxWidth()
-          .statusBarsPadding()
-          .height(56.dp)
-          .padding(horizontal = 16.dp)
-      ) {
-        CircularButton(R.drawable.ic_arrow_back)
-        CircularButton(R.drawable.ic_favorite)
-      }
+      CircularButton(
+        iconResource = R.drawable.ic_arrow_back,
+        onClick = { navController.popBackStack() }
+      )
+      CircularButton(iconResource = R.drawable.ic_favorite)
     }
     Box(
       modifier = Modifier
@@ -234,7 +280,7 @@ fun BasicInfo(recipe: Recipe) {
   ) {
     InfoColumn(R.drawable.ic_clock, recipe.cookingTime)
     InfoColumn(R.drawable.ic_flame, recipe.energy)
-    InfoColumn(R.drawable.ic_star, recipe.rating)
+    InfoColumn(R.drawable.ic_star, recipe.rating.toString())
   }
 }
 
@@ -285,9 +331,11 @@ fun IngredientsList(
 fun ShoppingListButton() {
   Button(
     onClick = { },
-    elevation = null,
+    elevation = ButtonDefaults.buttonElevation(
+      defaultElevation = 20.dp
+    ),
     colors = ButtonDefaults.buttonColors(
-      containerColor = Color.Transparent,
+      containerColor = Color.White,
       contentColor = Color.Black
     ),
     modifier = Modifier
@@ -340,6 +388,9 @@ fun OtherRecipes() {
       painter = painterResource(id = R.drawable.strawberry_pie_3),
       contentDescription = "Strawberry Pie",
       modifier = Modifier
+        .weight(1f)
+        .clip(RoundedCornerShape(12.dp))
+        .padding(all = 16.dp)
     )
   }
 }
